@@ -1,0 +1,867 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Checkout - My Store</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+
+        header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        header h1 {
+            margin: 0;
+        }
+
+
+        main {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+
+        .box h2 {
+            margin-top: 0;
+        }
+
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 7px;
+        }
+
+
+        input,
+        textarea,
+        select {
+
+            width: 100%;
+
+            padding: 13px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            font-size: 16px;
+
+        }
+
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+
+        .required {
+            color: red;
+        }
+
+
+        .order-item {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            border-bottom: 1px solid #ddd;
+
+            padding: 15px 0;
+
+        }
+
+
+        .order-item-name {
+            font-weight: bold;
+        }
+
+
+        .order-item-details {
+            color: #666;
+
+            margin-top: 5px;
+
+            font-size: 14px;
+
+        }
+
+
+        .summary-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-top: 15px;
+
+        }
+
+
+        .total {
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            border-top: 2px solid #222;
+
+            padding-top: 20px;
+
+            margin-top: 20px;
+
+        }
+
+
+        .pay-button {
+
+            width: 100%;
+
+            background: #111;
+
+            color: white;
+
+            border: none;
+
+            padding: 16px;
+
+            border-radius: 7px;
+
+            font-size: 17px;
+
+            cursor: pointer;
+
+            margin-top: 25px;
+
+        }
+
+
+        .pay-button:hover {
+            opacity: 0.85;
+        }
+
+
+        .pay-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+
+        .back-button {
+
+            display: inline-block;
+
+            margin-bottom: 25px;
+
+            color: #222;
+
+            text-decoration: none;
+
+        }
+
+
+        .empty-message {
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 10px;
+
+            text-align: center;
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .checkout-container {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <header>
+
+        <h1>My Store</h1>
+
+    </header>
+
+
+    <main>
+
+        <a
+            href="index.html"
+            class="back-button">
+
+            ← Back to Store
+
+        </a>
+
+
+        <div id="empty-message"></div>
+
+
+        <div
+            class="checkout-container"
+            id="checkout-container">
+
+
+            <!-- CUSTOMER INFORMATION -->
+
+            <div class="box">
+
+                <h2>Delivery Information</h2>
+
+
+                <form id="checkout-form">
+
+
+                    <label>
+                        Full Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="customer-name"
+                        placeholder="Your full name"
+                        required>
+
+
+                    <label>
+                        Phone Number
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="customer-phone"
+                        placeholder="05XXXXXXXX"
+                        required>
+
+
+                    <label>
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="customer-email"
+                        placeholder="you@example.com">
+
+
+                    <label>
+                        Delivery Address
+                        <span class="required">*</span>
+                    </label>
+
+                    <textarea
+                        id="customer-address"
+                        placeholder="Building, villa, apartment, street..."
+                        required></textarea>
+
+
+                    <label>
+                        City
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="customer-city"
+                        placeholder="Dubai"
+                        required>
+
+
+                    <label>
+                        Delivery Notes
+                    </label>
+
+                    <textarea
+                        id="customer-notes"
+                        placeholder="Any instructions for delivery?"></textarea>
+
+
+                </form>
+
+            </div>
+
+
+            <!-- ORDER SUMMARY -->
+
+            <div class="box">
+
+                <h2>Your Order</h2>
+
+
+                <div id="order-items"></div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Subtotal
+                    </span>
+
+                    <span>
+                        AED
+                        <span id="subtotal">
+                            0.00
+                        </span>
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Delivery
+                    </span>
+
+                    <span>
+                        AED
+                        <span id="delivery-fee">
+                            10.00
+                        </span>
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row total">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <span>
+                        AED
+                        <span id="total">
+                            0.00
+                        </span>
+                    </span>
+
+                </div>
+
+
+                <button
+                    id="pay-button"
+                    class="pay-button"
+                    type="button"
+                    onclick="proceedToPayment()">
+
+                    Proceed to Pay
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+
+        /*
+        -----------------------------------------
+        PRODUCTS
+        -----------------------------------------
+        */
+
+        const products = {
+
+            1: {
+                id: 1,
+                name: "Product 1",
+                price: 25
+            },
+
+            2: {
+                id: 2,
+                name: "Product 2",
+                price: 40
+            },
+
+            3: {
+                id: 3,
+                name: "Product 3",
+                price: 75
+            }
+
+        };
+
+
+        /*
+        -----------------------------------------
+        LOAD CART
+        -----------------------------------------
+        */
+
+        const cart =
+            JSON.parse(
+                localStorage.getItem("cart")
+            ) || [];
+
+
+        /*
+        -----------------------------------------
+        DISPLAY CART
+        -----------------------------------------
+        */
+
+        function displayOrder() {
+
+            const orderItems =
+                document.getElementById(
+                    "order-items"
+                );
+
+
+            const emptyMessage =
+                document.getElementById(
+                    "empty-message"
+                );
+
+
+            const checkoutContainer =
+                document.getElementById(
+                    "checkout-container"
+                );
+
+
+            /*
+            Empty cart
+            */
+
+            if (cart.length === 0) {
+
+                checkoutContainer.style.display =
+                    "none";
+
+
+                emptyMessage.innerHTML = `
+
+                    <div class="empty-message">
+
+                        <h2>
+                            Your cart is empty
+                        </h2>
+
+                        <p>
+                            Add some products before
+                            checking out.
+                        </p>
+
+                        <a href="index.html">
+                            Return to Store
+                        </a>
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            let subtotal = 0;
+
+
+            orderItems.innerHTML = "";
+
+
+            cart.forEach(item => {
+
+                const product =
+                    products[item.id];
+
+
+                /*
+                Ignore invalid products.
+                */
+
+                if (!product) {
+                    return;
+                }
+
+
+                const itemTotal =
+                    product.price *
+                    item.quantity;
+
+
+                subtotal += itemTotal;
+
+
+                const orderItem =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                orderItem.className =
+                    "order-item";
+
+
+                orderItem.innerHTML = `
+
+                    <div>
+
+                        <div class="order-item-name">
+                            ${product.name}
+                        </div>
+
+                        <div class="order-item-details">
+
+                            AED
+                            ${product.price.toFixed(2)}
+
+                            ×
+
+                            ${item.quantity}
+
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        AED
+                        ${itemTotal.toFixed(2)}
+
+                    </div>
+
+                `;
+
+
+                orderItems.appendChild(
+                    orderItem
+                );
+
+            });
+
+
+            /*
+            Delivery fee
+            */
+
+            const deliveryFee = 10;
+
+
+            /*
+            Total
+            */
+
+            const total =
+                subtotal + deliveryFee;
+
+
+            document.getElementById(
+                "subtotal"
+            ).textContent =
+                subtotal.toFixed(2);
+
+
+            document.getElementById(
+                "delivery-fee"
+            ).textContent =
+                deliveryFee.toFixed(2);
+
+
+            document.getElementById(
+                "total"
+            ).textContent =
+                total.toFixed(2);
+
+        }
+
+
+        /*
+        -----------------------------------------
+        PROCEED TO PAYMENT
+        -----------------------------------------
+        */
+
+        async function proceedToPayment() {
+
+            /*
+            Make sure there is something
+            in the cart.
+            */
+
+            if (cart.length === 0) {
+
+                alert("Your cart is empty.");
+
+                return;
+
+            }
+
+
+            const form =
+                document.getElementById(
+                    "checkout-form"
+                );
+
+
+            /*
+            Check required fields.
+            */
+
+            if (!form.checkValidity()) {
+
+                form.reportValidity();
+
+                return;
+
+            }
+
+
+            /*
+            Get customer information.
+            */
+
+            const customer = {
+
+                name:
+                    document.getElementById(
+                        "customer-name"
+                    ).value.trim(),
+
+                phone:
+                    document.getElementById(
+                        "customer-phone"
+                    ).value.trim(),
+
+                email:
+                    document.getElementById(
+                        "customer-email"
+                    ).value.trim(),
+
+                address:
+                    document.getElementById(
+                        "customer-address"
+                    ).value.trim(),
+
+                city:
+                    document.getElementById(
+                        "customer-city"
+                    ).value.trim(),
+
+                notes:
+                    document.getElementById(
+                        "customer-notes"
+                    ).value.trim()
+
+            };
+
+
+            /*
+            Temporarily save customer
+            information.
+
+            IMPORTANT:
+            This is NOT an order.
+
+            The permanent order will only
+            be created after Ziina confirms
+            successful payment.
+            */
+
+            localStorage.setItem(
+                "checkoutCustomer",
+                JSON.stringify(customer)
+            );
+
+
+            /*
+            Disable the button while
+            payment is being created.
+            */
+
+            const payButton =
+                document.getElementById(
+                    "pay-button"
+                );
+
+
+            payButton.disabled = true;
+
+            payButton.textContent =
+                "Connecting to Ziina...";
+
+
+            try {
+
+                /*
+                Send the cart to our secure
+                Netlify Function.
+
+                The server calculates the
+                actual prices and total.
+                */
+
+                const response =
+                    await fetch(
+                        "/.netlify/functions/create-payment",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+    cart: cart,
+    customer: customer
+})
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                /*
+                Check for server errors.
+                */
+
+                if (
+                    !response.ok ||
+                    !result.success
+                ) {
+
+                    throw new Error(
+                        result.message ||
+                        "Could not create payment."
+                    );
+
+                }
+
+
+                /*
+                Save the Ziina Payment Intent ID.
+
+                This will be used later when
+                we verify the payment.
+                */
+
+                localStorage.setItem(
+                    "ziinaPaymentIntentId",
+                    result.payment_intent_id
+                );
+
+
+                /*
+                Send customer to Ziina.
+                */
+
+                window.location.href =
+                    result.redirect_url;
+
+
+            } catch (error) {
+
+                console.error(
+                    "Payment error:",
+                    error
+                );
+
+
+                alert(
+                    "We couldn't start the payment. Please try again."
+                );
+
+
+                /*
+                Allow the customer to
+                try again.
+                */
+
+                payButton.disabled =
+                    false;
+
+                payButton.textContent =
+                    "Proceed to Pay";
+
+            }
+
+        }
+
+
+        /*
+        -----------------------------------------
+        START
+        -----------------------------------------
+        */
+
+        displayOrder();
+
+    </script>
+
+
+</body>
+
+</html>
