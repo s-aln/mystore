@@ -229,19 +229,20 @@ exports.handler = async function (event) {
                     "Prefer": "return=representation"
                 },
                 body: JSON.stringify({
-                    customer_name: session.customer_name,
-                    phone: session.phone,
-                    email: session.email,
-                    address: session.address,
-                    city: session.city,
-                    notes: session.notes,
-                    items: session.items,
-                    subtotal: session.subtotal,
-                    delivery_fee: session.delivery_fee,
-                    total: session.total,
-                    payment_status: "paid",
-                    ziina_payment_id: session.payment_intent_id
-                })
+    customer_name: session.customer_name,
+    phone: session.phone,
+    email: session.email,
+    address: session.address,
+    city: session.city,
+    notes: session.notes,
+    items: session.items,
+    subtotal: session.subtotal,
+    delivery_fee: session.delivery_fee,
+    total: session.total,
+    payment_status: "paid",
+    ziina_payment_id: session.payment_intent_id,
+    created_at: new Date().toISOString()
+})
             }
         );
 
