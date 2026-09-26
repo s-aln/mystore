@@ -49,7 +49,7 @@ exports.handler = async function (event) {
         const products = {
             1: {
                 name: "Product 1",
-                price: 25
+                price: 2
             },
             2: {
                 name: "Product 2",
@@ -96,7 +96,7 @@ exports.handler = async function (event) {
         }
 
         // Current test delivery fee
-        const deliveryFee = 10;
+        const deliveryFee = 0;
 
         const total = subtotal + deliveryFee;
 

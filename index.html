@@ -211,7 +211,7 @@
                 </p>
 
                 <div class="price">
-                    AED 25
+                    AED 2
                 </div>
 
                 <button onclick="addToCart(1)">
@@ -317,7 +317,7 @@
             1: {
                 id: 1,
                 name: "Product 1",
-                price: 25
+                price: 2
             },
 
             2: {
@@ -644,17 +644,17 @@
 
         function goToCheckout() {
 
-if (cart.length === 0) {
+            if (cart.length === 0) {
 
-    alert("Your cart is empty.");
+                alert("Your cart is empty.");
 
-    return;
+                return;
 
-}
+            }
 
-window.location.href = "checkout.html";
+            window.location.href = "checkout.html";
 
-}
+        }
 
 
         /*

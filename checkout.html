@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -377,7 +376,7 @@
                     <span>
                         AED
                         <span id="delivery-fee">
-                            10.00
+                            0.00
                         </span>
                     </span>
 
@@ -431,7 +430,7 @@
             1: {
                 id: 1,
                 name: "Product 1",
-                price: 25
+                price: 2
             },
 
             2: {
@@ -605,7 +604,7 @@
             Delivery fee
             */
 
-            const deliveryFee = 10;
+            const deliveryFee = 0;
 
 
             /*
@@ -773,9 +772,9 @@
                             },
 
                             body: JSON.stringify({
-    cart: cart,
-    customer: customer
-})
+                                cart: cart,
+                                customer: customer
+                            })
                         }
                     );
 
