@@ -198,7 +198,7 @@ exports.handler = async function (event) {
                     failure_url:
                         `${siteUrl}/payment-failed.html?session_id=${sessionId}`,
 
-                    test: true,
+                    test: false,
                     allow_tips: false
                 })
             }
