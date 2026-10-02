@@ -1,88 +1,151 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Payment Cancelled - Slyde</title>
 
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-<style>
-    * {
-        box-sizing: border-box;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            color: #222;
+        }
 
-    body {
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        margin: 0;
-        color: #222;
-    }
+        /* HEADER */
 
-    /* HEADER */
+        .logo {
+            height: 60px;
+            width: auto;
+            display: block;
+        }
 
-    .logo {
-        height: 60px;
-        width: auto;
-        display: block;
-    }
+        header {
+            background: black;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-    header {
-        background: black;
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        border-bottom: 1px solid #ddd;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
+        .box {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
 
-    .box {
-        max-width: 500px;
-        margin: 50px auto;
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
+        .box a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: #111;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
 
-    .box a {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 12px 20px;
-    background: #111;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-}
-
-.box a:hover {
-    opacity: 0.85;
-}
-</style>
-
+        .box a:hover {
+            opacity: 0.85;
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-   <a href="index.html">
-    <img src="images/logo.png" alt="Slyde logo" class="logo">
-</a>
+    <a href="index.html">
+        <img
+            src="images/logo.png"
+            alt="Slyde logo"
+            class="logo"
+        >
+    </a>
 </header>
 
 <div class="box">
+
     <h1>Payment Cancelled</h1>
 
-<p>Your payment was cancelled.</p>
+    <p>Your payment was cancelled.</p>
 
-<p>No order has been created.</p>
+    <p>No order has been created.</p>
 
-<a href="checkout.html">Return to Checkout</a>
+    <a href="checkout.html">
+        Return to Checkout
+    </a>
 
 </div>
+
+<script>
+    async function releaseStock() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const sessionId =
+            params.get("session_id");
+
+        if (!sessionId) {
+            return;
+        }
+
+        try {
+
+            const response =
+                await fetch(
+                    "/.netlify/functions/release-stock",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            session_id:
+                                sessionId
+                        })
+                    }
+                );
+
+            const result =
+                await response.json();
+
+            if (!response.ok) {
+                console.error(
+                    "Could not release stock:",
+                    result
+                );
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Stock release error:",
+                error
+            );
+        }
+    }
+
+    releaseStock();
+</script>
 
 </body>
 </html>

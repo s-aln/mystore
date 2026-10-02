@@ -18,8 +18,6 @@
             color: #222;
         }
 
-        /* HEADER */
-
         header {
             background: black;
             padding: 10px;
@@ -48,8 +46,6 @@
             font-size: 15px;
         }
 
-        /* MAIN */
-
         main {
             max-width: 1100px;
             margin: 40px auto;
@@ -72,8 +68,6 @@
             grid-template-columns: 1fr 1fr;
             gap: 40px;
         }
-
-        /* GALLERY */
 
         .gallery {
             width: 100%;
@@ -134,8 +128,6 @@
         .dot.active {
             background: #111;
         }
-
-        /* DETAILS */
 
         .details h1 {
             margin-top: 0;
@@ -205,6 +197,19 @@
 
         .buy-now {
             background: #444;
+        }
+
+        /* SOLD OUT */
+
+        .sold-out {
+            background: #111;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            padding: 14px;
+            border-radius: 6px;
+            margin-top: 25px;
+            letter-spacing: 0.5px;
         }
 
         /* CART */
@@ -297,8 +302,6 @@
             color: #666;
         }
 
-        /* MOBILE */
-
         @media (max-width: 800px) {
 
             .product-page {
@@ -308,7 +311,6 @@
             .main-image {
                 height: 400px;
             }
-
         }
 
         @media (max-width: 500px) {
@@ -320,7 +322,6 @@
             .action-buttons {
                 grid-template-columns: 1fr;
             }
-
         }
     </style>
 </head>
@@ -409,37 +410,39 @@
                 class="description">
             </div>
 
+            <div id="product-actions">
 
-            <div class="quantity">
+                <div class="quantity">
 
-                <button onclick="changeQuantity(-1)">
-                    −
-                </button>
+                    <button onclick="changeQuantity(-1)">
+                        −
+                    </button>
 
-                <span id="quantity">
-                    1
-                </span>
+                    <span id="quantity">
+                        1
+                    </span>
 
-                <button onclick="changeQuantity(1)">
-                    +
-                </button>
+                    <button onclick="changeQuantity(1)">
+                        +
+                    </button>
 
-            </div>
+                </div>
 
+                <div class="action-buttons">
 
-            <div class="action-buttons">
+                    <button onclick="addToCart()">
+                        Add to Cart
+                    </button>
 
-                <button onclick="addToCart()">
-                    Add to Cart
-                </button>
+                    <button
+                        class="buy-now"
+                        onclick="buyNow()">
 
-                <button
-                    class="buy-now"
-                    onclick="buyNow()">
+                        Buy Now
 
-                    Buy Now
+                    </button>
 
-                </button>
+                </div>
 
             </div>
 
@@ -503,8 +506,10 @@
     const products = {
 
         1: {
+            id: 1,
             name: "Japanese Style Mouse Pad",
             price: 2,
+            stock: 0,
             description: `
                 Size: 80 × 40 cm (800 × 400 mm)
                 <ul>
@@ -522,8 +527,10 @@
         },
 
         2: {
+            id: 2,
             name: "Dark Ceramic Style Mouse Pad",
             price: 2,
+            stock: 0,
             description: `
                 Size: 80 × 40 cm (800 × 400 mm)
                 <ul>
@@ -565,6 +572,75 @@
     let imageIndex = 0;
 
 
+    /* LOAD CURRENT STOCK */
+
+    async function loadStock() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/.netlify/functions/get-products"
+                );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to load products"
+                );
+            }
+
+            const data =
+                await response.json();
+
+            if (!data.success) {
+                throw new Error(
+                    "Failed to load products"
+                );
+            }
+
+            const serverProduct =
+                data.products.find(
+                    item =>
+                        Number(item.id) === productId
+                );
+
+            if (!serverProduct) {
+                return;
+            }
+
+            product.stock =
+                Number(serverProduct.stock);
+
+            product.price =
+                Number(serverProduct.price);
+
+            product.name =
+                serverProduct.name;
+
+            document.getElementById(
+                "product-name"
+            ).textContent =
+                product.name;
+
+            document.getElementById(
+                "product-price"
+            ).textContent =
+                "AED " + product.price;
+
+            updateStockDisplay();
+
+        } catch (error) {
+
+            console.error(
+                "Could not load product stock:",
+                error
+            );
+
+        }
+
+    }
+
+
     /* CHECK PRODUCT */
 
     if (!product) {
@@ -586,12 +662,22 @@
     }
 
 
+    /* CHANGE QUANTITY */
+
     function changeQuantity(amount) {
+
+        if (product.stock <= 0) {
+            return;
+        }
 
         quantity += amount;
 
         if (quantity < 1) {
             quantity = 1;
+        }
+
+        if (quantity > product.stock) {
+            quantity = product.stock;
         }
 
         document.getElementById(
@@ -601,7 +687,7 @@
     }
 
 
-    /* GALLERY */
+    /* SHOW PRODUCT */
 
     function loadProduct() {
 
@@ -621,8 +707,59 @@
 
         updateImage();
 
+        loadStock();
+
     }
 
+
+    /* STOCK DISPLAY */
+
+    function updateStockDisplay() {
+
+        const actions =
+            document.getElementById(
+                "product-actions"
+            );
+
+        if (!actions) {
+            return;
+        }
+
+        if (product.stock <= 0) {
+
+            actions.innerHTML = `
+                <div class="sold-out">
+                    SOLD OUT
+                </div>
+            `;
+
+            return;
+        }
+
+        /*
+        If stock is available, leave the
+        normal quantity and buttons visible.
+        */
+
+        if (
+            quantity >
+            product.stock
+        ) {
+
+            quantity =
+                product.stock;
+
+            document.getElementById(
+                "quantity"
+            ).textContent =
+                quantity;
+
+        }
+
+    }
+
+
+    /* GALLERY */
 
     function updateImage() {
 
@@ -657,8 +794,10 @@
         imageIndex--;
 
         if (imageIndex < 0) {
+
             imageIndex =
                 product.images.length - 1;
+
         }
 
         updateImage();
@@ -684,9 +823,11 @@
 
             dot.className =
                 "dot" +
-                (i === imageIndex
-                    ? " active"
-                    : "");
+                (
+                    i === imageIndex
+                        ? " active"
+                        : ""
+                );
 
             dot.onclick = function () {
 
@@ -713,15 +854,46 @@
 
     function addToCart() {
 
+        if (product.stock <= 0) {
+
+            alert(
+                "This product is sold out."
+            );
+
+            return;
+        }
+
         const existingItem =
             cart.find(
-                item => item.id === productId
+                item =>
+                    item.id === productId
             );
+
+
+        const currentCartQuantity =
+            existingItem
+                ? existingItem.quantity
+                : 0;
+
+
+        if (
+            currentCartQuantity +
+            quantity >
+            product.stock
+        ) {
+
+            alert(
+                `Only ${product.stock} available.`
+            );
+
+            return;
+        }
 
 
         if (existingItem) {
 
-            existingItem.quantity += quantity;
+            existingItem.quantity +=
+                quantity;
 
         } else {
 
@@ -744,6 +916,25 @@
 
 
     function buyNow() {
+
+        if (product.stock <= 0) {
+
+            alert(
+                "This product is sold out."
+            );
+
+            return;
+        }
+
+        if (quantity > product.stock) {
+
+            alert(
+                `Only ${product.stock} available.`
+            );
+
+            return;
+        }
+
 
         cart = [
 
@@ -830,6 +1021,22 @@
             }
 
 
+            if (itemProduct.stock <= 0) {
+                return;
+            }
+
+
+            if (
+                item.quantity >
+                itemProduct.stock
+            ) {
+
+                item.quantity =
+                    itemProduct.stock;
+
+            }
+
+
             const itemTotal =
                 itemProduct.price *
                 item.quantity;
@@ -913,11 +1120,33 @@
     function increaseCartQuantity(id) {
 
         const item =
-            cart.find(item => item.id === id);
+            cart.find(
+                item => item.id === id
+            );
 
-        if (item) {
-            item.quantity++;
+        const itemProduct =
+            products[id];
+
+
+        if (!item || !itemProduct) {
+            return;
         }
+
+
+        if (
+            item.quantity >=
+            itemProduct.stock
+        ) {
+
+            alert(
+                `Only ${itemProduct.stock} available.`
+            );
+
+            return;
+        }
+
+
+        item.quantity++;
 
         updateCart();
 
@@ -927,7 +1156,9 @@
     function decreaseCartQuantity(id) {
 
         const item =
-            cart.find(item => item.id === id);
+            cart.find(
+                item => item.id === id
+            );
 
         if (!item) {
             return;
@@ -989,7 +1220,9 @@
 
         if (cart.length === 0) {
 
-            alert("Your cart is empty.");
+            alert(
+                "Your cart is empty."
+            );
 
             return;
 

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,8 +18,6 @@
             color: #222;
         }
 
-        /* HEADER */
-
         header {
             background: black;
             padding: 10px;
@@ -37,8 +34,6 @@
             width: auto;
             display: block;
         }
-
-        /* DASHBOARD */
 
         main {
             max-width: 1100px;
@@ -139,10 +134,75 @@
             margin-top: 5px;
         }
 
-        .inventory-stock {
+        .stock-info {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .stock-info span {
+            color: #666;
+        }
+
+        .stock-info strong {
+            color: #222;
+        }
+
+        .stock-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stock-button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ccc;
+            background: #f5f5f5;
+            border-radius: 6px;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .stock-button:hover {
+            background: #e8e8e8;
+        }
+
+        .stock-input {
+            width: 80px;
+            height: 40px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
             font-size: 18px;
             font-weight: bold;
-            white-space: nowrap;
+        }
+
+        .save-stock-button {
+            height: 40px;
+            padding: 0 15px;
+            background: #111;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .save-stock-button:hover {
+            opacity: 0.85;
+        }
+
+        .stock-status {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stock-status.success {
+            color: #18794e;
+        }
+
+        .stock-status.error {
+            color: #b00020;
         }
 
         /* ORDERS */
@@ -240,8 +300,9 @@
                 align-items: flex-start;
             }
 
-            .inventory-stock {
-                white-space: normal;
+            .stock-control {
+                width: 100%;
+                flex-wrap: wrap;
             }
 
             .order-header {
@@ -480,6 +541,9 @@ function showInventory(products) {
 
     products.forEach(product => {
 
+        const stock =
+            Number(product.stock);
+
         const productElement =
             document.createElement("div");
 
@@ -498,10 +562,62 @@ function showInventory(products) {
                     AED ${Number(product.price).toFixed(2)}
                 </div>
 
+                <div class="stock-info">
+
+                    <span>
+                        Stock:
+                        <strong id="stock-display-${product.id}">
+                            ${stock}
+                        </strong>
+                    </span>
+
+                </div>
+
             </div>
 
-            <div class="inventory-stock">
-                Stock: ${Number(product.stock)}
+            <div>
+
+                <div class="stock-control">
+
+                    <button
+                        type="button"
+                        class="stock-button"
+                        onclick="changeStock(${product.id}, -1)"
+                    >
+                        −
+                    </button>
+
+                    <input
+                        type="number"
+                        min="0"
+                        class="stock-input"
+                        id="stock-${product.id}"
+                        value="${stock}"
+                    >
+
+                    <button
+                        type="button"
+                        class="stock-button"
+                        onclick="changeStock(${product.id}, 1)"
+                    >
+                        +
+                    </button>
+
+                    <button
+                        type="button"
+                        class="save-stock-button"
+                        onclick="saveStock(${product.id})"
+                    >
+                        Save
+                    </button>
+
+                </div>
+
+                <div
+                    id="stock-status-${product.id}"
+                    class="stock-status">
+                </div>
+
             </div>
 
         `;
@@ -511,6 +627,145 @@ function showInventory(products) {
         );
 
     });
+}
+
+
+function changeStock(productId, amount) {
+
+    const input =
+        document.getElementById(
+            `stock-${productId}`
+        );
+
+    const current =
+        Number(input.value) || 0;
+
+    const newValue =
+        Math.max(
+            0,
+            current + amount
+        );
+
+    input.value =
+        newValue;
+}
+
+
+async function saveStock(productId) {
+
+    const input =
+        document.getElementById(
+            `stock-${productId}`
+        );
+
+    const status =
+        document.getElementById(
+            `stock-status-${productId}`
+        );
+
+    const stock =
+        Number(input.value);
+
+    if (
+        !Number.isInteger(stock) ||
+        stock < 0
+    ) {
+
+        status.className =
+            "stock-status error";
+
+        status.textContent =
+            "Enter a valid stock number.";
+
+        return;
+    }
+
+    status.className =
+        "stock-status";
+
+    status.textContent =
+        "Saving...";
+
+    try {
+
+        const response =
+            await fetch(
+                "/.netlify/functions/update-stock",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        product_id:
+                            productId,
+                        stock:
+                            stock
+                    })
+                }
+            );
+
+        if (response.status === 401) {
+
+            status.className =
+                "stock-status error";
+
+            status.textContent =
+                "Your dashboard session expired.";
+
+            return;
+        }
+
+        const result =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.error ||
+                "Could not update stock."
+            );
+        }
+
+        const updatedProduct =
+            result.product;
+
+        const updatedStock =
+            Number(updatedProduct.stock);
+
+        input.value =
+            updatedStock;
+
+        document.getElementById(
+            `stock-display-${productId}`
+        ).textContent =
+            updatedStock;
+
+        status.className =
+            "stock-status success";
+
+        status.textContent =
+            "Stock saved.";
+
+    } catch (error) {
+
+        console.error(
+            "Stock update error:",
+            error
+        );
+
+        status.className =
+            "stock-status error";
+
+        status.textContent =
+            error.message;
+    }
 }
 
 

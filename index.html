@@ -137,6 +137,19 @@
             margin: 15px 0;
         }
 
+        /* SOLD OUT */
+
+        .sold-out {
+            background: #111;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            padding: 13px;
+            border-radius: 6px;
+            margin-top: 15px;
+            letter-spacing: 0.5px;
+        }
+
         /* PRODUCT ACTIONS */
 
         .product-actions {
@@ -188,56 +201,36 @@
 
         /* CART */
 
-      .cart-overlay {
-    visibility: hidden;
-    opacity: 0;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 20;
-    transition: opacity 0.25s ease-out, visibility 0.25s ease-out;
-}
-
-.cart-overlay.open {
-    visibility: visible;
-    opacity: 1;
-}
-
-.cart {
-    background: white;
-    width: 100%;
-    max-width: 500px;
-    height: 100%;
-    margin-left: auto;
-    padding: 25px;
-    overflow-y: auto;
-
-    transform: translateX(100%);
-    transition: transform 0.35s ease-out;
-}
-
-.cart-overlay.open .cart {
-    transform: translateX(0);
-}
-
-        @keyframes overlayFadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+        .cart-overlay {
+            visibility: hidden;
+            opacity: 0;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            transition: opacity 0.25s ease-out, visibility 0.25s ease-out;
         }
 
-        @keyframes cartSlideIn {
-            from {
-                transform: translateX(100%);
-            }
+        .cart-overlay.open {
+            visibility: visible;
+            opacity: 1;
+        }
 
-            to {
-                transform: translateX(0);
-            }
+        .cart {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            margin-left: auto;
+            padding: 25px;
+            overflow-y: auto;
+
+            transform: translateX(100%);
+            transition: transform 0.35s ease-out;
+        }
+
+        .cart-overlay.open .cart {
+            transform: translateX(0);
         }
 
         .cart-header {
@@ -351,10 +344,9 @@
                 width: 75px;
                 height: 75px;
             }
-
         }
 
-        /* REDUCE ANIMATION FOR USERS WHO PREFER LESS MOTION */
+        /* REDUCE ANIMATION */
 
         @media (prefers-reduced-motion: reduce) {
 
@@ -364,15 +356,14 @@
                 transform: none;
             }
 
-          .cart-overlay.open {
-    opacity: 1;
-}
+            .cart-overlay.open {
+                opacity: 1;
+            }
 
-.cart,
-.cart-overlay.open .cart {
-    transform: translateX(0);
-}
-
+            .cart,
+            .cart-overlay.open .cart {
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
@@ -405,10 +396,9 @@
 
         <div class="products">
 
-
             <!-- PRODUCT 1 -->
 
-            <div class="product">
+            <div class="product" id="product-card-1">
 
                 <a
                     href="product.html?id=1"
@@ -439,7 +429,7 @@
                     AED 2
                 </div>
 
-                <div class="product-actions">
+                <div class="product-actions" id="product-actions-1">
 
                     <div class="quantity-selector">
 
@@ -483,7 +473,7 @@
 
             <!-- PRODUCT 2 -->
 
-            <div class="product">
+            <div class="product" id="product-card-2">
 
                 <a
                     href="product.html?id=2"
@@ -514,7 +504,7 @@
                     AED 2
                 </div>
 
-                <div class="product-actions">
+                <div class="product-actions" id="product-actions-2">
 
                     <div class="quantity-selector">
 
@@ -614,17 +604,110 @@
                 id: 1,
                 name: "Japanese Style Mouse Pad",
                 price: 2,
-                image: "images/Japan.jpeg"
+                image: "images/Japan.jpeg",
+                stock: 0
             },
 
             2: {
                 id: 2,
                 name: "Dark Ceramic Style Mouse Pad",
                 price: 2,
-                image: "images/Gray.jpeg"
+                image: "images/Gray.jpeg",
+                stock: 0
             }
 
         };
+
+
+        /*
+        -----------------------------------------
+        LOAD CURRENT STOCK
+        -----------------------------------------
+        */
+
+        async function loadProducts() {
+
+            try {
+
+                const response =
+                    await fetch("/.netlify/functions/get-products");
+
+                if (!response.ok) {
+                    throw new Error("Failed to load products");
+                }
+
+                const data =
+                    await response.json();
+
+                if (!data.success) {
+                    throw new Error("Failed to load products");
+                }
+
+                data.products.forEach(product => {
+
+                    if (products[product.id]) {
+
+                        products[product.id].stock =
+                            Number(product.stock);
+
+                        products[product.id].price =
+                            Number(product.price);
+
+                        products[product.id].name =
+                            product.name;
+
+                    }
+
+                });
+
+                updateProductStockDisplay();
+
+                updateCart();
+
+            } catch (error) {
+
+                console.error(
+                    "Could not load product stock:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /*
+        -----------------------------------------
+        SHOW SOLD OUT
+        -----------------------------------------
+        */
+
+        function updateProductStockDisplay() {
+
+            Object.values(products).forEach(product => {
+
+                const actions =
+                    document.getElementById(
+                        `product-actions-${product.id}`
+                    );
+
+                if (!actions) {
+                    return;
+                }
+
+                if (product.stock <= 0) {
+
+                    actions.innerHTML = `
+                        <div class="sold-out">
+                            SOLD OUT
+                        </div>
+                    `;
+
+                }
+
+            });
+
+        }
 
 
         /*
@@ -651,16 +734,32 @@
 
         function changeProductQuantity(productId, amount) {
 
+            const product =
+                products[productId];
+
+            if (!product || product.stock <= 0) {
+                return;
+            }
+
             selectedQuantities[productId] += amount;
 
             if (selectedQuantities[productId] < 1) {
                 selectedQuantities[productId] = 1;
             }
 
+            if (
+                selectedQuantities[productId] >
+                product.stock
+            ) {
+                selectedQuantities[productId] =
+                    product.stock;
+            }
+
             document.getElementById(
                 `quantity-${productId}`
             ).textContent =
                 selectedQuantities[productId];
+
         }
 
 
@@ -688,9 +787,39 @@
 
         function addToCart(productId, quantity = 1) {
 
-            const existingItem = cart.find(
-                item => item.id === productId
-            );
+            const product =
+                products[productId];
+
+            if (!product || product.stock <= 0) {
+
+                alert("This product is sold out.");
+
+                return;
+            }
+
+            const existingItem =
+                cart.find(
+                    item => item.id === productId
+                );
+
+
+            const currentCartQuantity =
+                existingItem
+                    ? existingItem.quantity
+                    : 0;
+
+
+            if (
+                currentCartQuantity + quantity >
+                product.stock
+            ) {
+
+                alert(
+                    `Only ${product.stock} available.`
+                );
+
+                return;
+            }
 
 
             if (existingItem) {
@@ -725,8 +854,29 @@
 
         function buyNow(productId) {
 
+            const product =
+                products[productId];
+
+            if (!product || product.stock <= 0) {
+
+                alert("This product is sold out.");
+
+                return;
+            }
+
             const quantity =
                 selectedQuantities[productId];
+
+
+            if (quantity > product.stock) {
+
+                alert(
+                    `Only ${product.stock} available.`
+                );
+
+                return;
+            }
+
 
             cart = [
                 {
@@ -735,12 +885,15 @@
                 }
             ];
 
+
             localStorage.setItem(
                 "cart",
                 JSON.stringify(cart)
             );
 
-            window.location.href = "checkout.html";
+
+            window.location.href =
+                "checkout.html";
 
         }
 
@@ -757,6 +910,7 @@
                 "cart",
                 JSON.stringify(cart)
             );
+
 
             const cartItems =
                 document.getElementById("cart-items");
@@ -784,9 +938,11 @@
                     </div>
                 `;
 
-                cartTotal.textContent = "0.00";
+                cartTotal.textContent =
+                    "0.00";
 
-                cartCount.textContent = "0";
+                cartCount.textContent =
+                    "0";
 
                 return;
 
@@ -804,8 +960,27 @@
                 }
 
 
+                /*
+                Remove or reduce items that are
+                no longer available.
+                */
+
+                if (product.stock <= 0) {
+                    return;
+                }
+
+
+                if (item.quantity > product.stock) {
+
+                    item.quantity =
+                        product.stock;
+
+                }
+
+
                 const itemTotal =
-                    product.price * item.quantity;
+                    product.price *
+                    item.quantity;
 
 
                 total += itemTotal;
@@ -817,7 +992,8 @@
                     document.createElement("div");
 
 
-                cartItem.className = "cart-item";
+                cartItem.className =
+                    "cart-item";
 
 
                 cartItem.innerHTML = `
@@ -907,12 +1083,33 @@
         function increaseQuantity(productId) {
 
             const item =
-                cart.find(item => item.id === productId);
+                cart.find(
+                    item => item.id === productId
+                );
+
+            const product =
+                products[productId];
 
 
-            if (item) {
-                item.quantity++;
+            if (!item || !product) {
+                return;
             }
+
+
+            if (
+                item.quantity >=
+                product.stock
+            ) {
+
+                alert(
+                    `Only ${product.stock} available.`
+                );
+
+                return;
+            }
+
+
+            item.quantity++;
 
 
             updateCart();
@@ -929,7 +1126,9 @@
         function decreaseQuantity(productId) {
 
             const item =
-                cart.find(item => item.id === productId);
+                cart.find(
+                    item => item.id === productId
+                );
 
 
             if (!item) {
@@ -944,7 +1143,8 @@
 
                 cart =
                     cart.filter(
-                        item => item.id !== productId
+                        item =>
+                            item.id !== productId
                     );
 
             }
@@ -965,7 +1165,8 @@
 
             cart =
                 cart.filter(
-                    item => item.id !== productId
+                    item =>
+                        item.id !== productId
                 );
 
 
@@ -980,16 +1181,18 @@
         -----------------------------------------
         */
 
-      function openCart() {
+        function openCart() {
 
-    const overlay =
-        document.getElementById("cart-overlay");
+            const overlay =
+                document.getElementById(
+                    "cart-overlay"
+                );
 
-    overlay.classList.add("open");
+            overlay.classList.add("open");
 
-    updateCart();
+            updateCart();
 
-}
+        }
 
 
         /*
@@ -1001,7 +1204,9 @@
         function closeCart() {
 
             const overlay =
-                document.getElementById("cart-overlay");
+                document.getElementById(
+                    "cart-overlay"
+                );
 
             overlay.classList.remove("open");
 
@@ -1018,13 +1223,17 @@
 
             if (cart.length === 0) {
 
-                alert("Your cart is empty.");
+                alert(
+                    "Your cart is empty."
+                );
 
                 return;
 
             }
 
-            window.location.href = "checkout.html";
+
+            window.location.href =
+                "checkout.html";
 
         }
 
@@ -1036,6 +1245,8 @@
         */
 
         updateCart();
+
+        loadProducts();
 
     </script>
 

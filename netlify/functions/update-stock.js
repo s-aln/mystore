@@ -20,7 +20,8 @@ exports.handler = async function (event) {
             return {
                 statusCode: 500,
                 body: JSON.stringify({
-                    error: "Dashboard session secret is missing."
+                    error:
+                        "Dashboard session secret is missing."
                 })
             };
         }
@@ -33,7 +34,9 @@ exports.handler = async function (event) {
                 .split(";")
                 .map(cookie => cookie.trim())
                 .find(cookie =>
-                    cookie.startsWith("slyde_dashboard=")
+                    cookie.startsWith(
+                        "slyde_dashboard="
+                    )
                 );
 
         if (!sessionCookie) {
@@ -139,6 +142,18 @@ exports.handler = async function (event) {
             };
         }
 
+        const supabaseHeaders = {
+            "apikey": supabaseKey,
+            "Authorization":
+                `Bearer ${supabaseKey}`,
+            "Content-Type":
+                "application/json"
+        };
+
+        // --------------------------------------------------
+        // 1. Read request
+        // --------------------------------------------------
+
         const body =
             JSON.parse(event.body || "{}");
 
@@ -162,6 +177,51 @@ exports.handler = async function (event) {
             };
         }
 
+        // --------------------------------------------------
+        // 2. Check that the product exists
+        // --------------------------------------------------
+
+        const productResponse =
+            await fetch(
+                `${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(productId)}&select=id,name,stock`,
+                {
+                    method: "GET",
+                    headers: supabaseHeaders
+                }
+            );
+
+        const products =
+            await productResponse.json();
+
+        if (!productResponse.ok) {
+            console.error(
+                "Supabase product lookup error:",
+                products
+            );
+
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error:
+                        "Could not check current product stock."
+                })
+            };
+        }
+
+        if (products.length === 0) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    error:
+                        "Product not found."
+                })
+            };
+        }
+
+        // --------------------------------------------------
+        // 3. Update stock
+        // --------------------------------------------------
+
         const response =
             await fetch(
                 `${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(productId)}`,
@@ -169,18 +229,16 @@ exports.handler = async function (event) {
                     method: "PATCH",
 
                     headers: {
-                        "apikey": supabaseKey,
-                        "Authorization":
-                            `Bearer ${supabaseKey}`,
-                        "Content-Type":
-                            "application/json",
+                        ...supabaseHeaders,
                         "Prefer":
                             "return=representation"
                     },
 
-                    body: JSON.stringify({
-                        stock: stock
-                    })
+                    body:
+                        JSON.stringify({
+                            stock:
+                                stock
+                        })
                 }
             );
 
@@ -221,10 +279,14 @@ exports.handler = async function (event) {
                     "application/json"
             },
 
-            body: JSON.stringify({
-                success: true,
-                product: result[0]
-            })
+            body:
+                JSON.stringify({
+                    success:
+                        true,
+
+                    product:
+                        result[0]
+                })
         };
 
     } catch (error) {
@@ -236,10 +298,12 @@ exports.handler = async function (event) {
 
         return {
             statusCode: 500,
-            body: JSON.stringify({
-                error:
-                    "Server error while updating stock."
-            })
+
+            body:
+                JSON.stringify({
+                    error:
+                        "Server error while updating stock."
+                })
         };
     }
 };
