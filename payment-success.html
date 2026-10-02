@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payment Successful - My Store</title>
+<title>Payment Successful - Slyde</title>
 
 <style>
 * {
@@ -18,14 +17,23 @@ body {
     color: #222;
 }
 
-header {
-    background: white;
-    padding: 20px;
-    border-bottom: 1px solid #ddd;
+/* HEADER */
+
+.logo {
+    height: 60px;
+    width: auto;
+    display: block;
 }
 
-header h1 {
-    margin: 0;
+header {
+    background: black;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 main {
@@ -136,7 +144,9 @@ h2 {
 <body>
 
 <header>
-    <h1>My Store</h1>
+  <a href="index.html">
+    <img src="images/logo.png" alt="Slyde logo" class="logo">
+  </a>
 </header>
 
 <main>
@@ -198,6 +208,21 @@ h2 {
             <div class="receipt-row">
                 <span class="receipt-label">Customer</span>
                 <span class="receipt-value" id="customer-name"></span>
+            </div>
+
+            <div class="receipt-row">
+                <span class="receipt-label">Address</span>
+                <span class="receipt-value" id="customer-address"></span>
+            </div>
+
+            <div class="receipt-row">
+                <span class="receipt-label">City</span>
+                <span class="receipt-value" id="customer-city"></span>
+            </div>
+
+            <div class="receipt-row">
+                <span class="receipt-label">Emirate</span>
+                <span class="receipt-value" id="customer-emirate"></span>
             </div>
 
             <div class="receipt-row">
@@ -316,6 +341,15 @@ function showReceipt(order) {
 
     document.getElementById("customer-name").textContent =
         order.customer_name;
+
+    document.getElementById("customer-address").textContent =
+        order.address;
+
+    document.getElementById("customer-city").textContent =
+        order.city;
+
+    document.getElementById("customer-emirate").textContent =
+        order.emirate;
 
     document.getElementById("subtotal").textContent =
         Number(order.subtotal).toFixed(2);

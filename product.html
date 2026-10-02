@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Product - Slyde</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        /* HEADER */
+
+        header {
+            background: black;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+            display: block;
+        }
+
+        .cart-button {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        /* MAIN */
+
+        main {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .product-page {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        /* GALLERY */
+
+        .gallery {
+            width: 100%;
+        }
+
+        .image-container {
+            position: relative;
+            background: #f8f8f8;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 500px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 28px;
+            line-height: 45px;
+            text-align: center;
+        }
+
+        .arrow-left {
+            left: 15px;
+        }
+
+        .arrow-right {
+            right: 15px;
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            padding: 0;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .dot.active {
+            background: #111;
+        }
+
+        /* DETAILS */
+
+        .details h1 {
+            margin-top: 0;
+            font-size: 32px;
+        }
+
+        .price {
+            font-size: 26px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .description {
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .quantity button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            font-size: 20px;
+        }
+
+        .quantity span {
+            min-width: 35px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        button {
+            background: #111;
+            color: white;
+            border: none;
+            padding: 13px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .buy-now {
+            background: #444;
+        }
+
+        /* CART */
+
+        .cart-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 20;
+        }
+
+        .cart {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            margin-left: auto;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .cart-header h2 {
+            margin: 0;
+        }
+
+        .close-cart {
+            background: #eee;
+            color: #222;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #ddd;
+            padding: 20px 0;
+        }
+
+        .cart-item-top {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+        }
+
+        .cart-item-price {
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .cart-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .cart-controls button {
+            padding: 6px 10px;
+        }
+
+        .remove {
+            background: #eee;
+            color: #222;
+        }
+
+        .cart-total {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 25px 0 20px;
+        }
+
+        .checkout {
+            width: 100%;
+            font-size: 17px;
+            padding: 15px;
+        }
+
+        .empty {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 800px) {
+
+            .product-page {
+                grid-template-columns: 1fr;
+            }
+
+            .main-image {
+                height: 400px;
+            }
+
+        }
+
+        @media (max-width: 500px) {
+
+            .main-image {
+                height: 300px;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <a href="index.html">
+        <img
+            src="images/logo.png"
+            alt="Slyde logo"
+            class="logo">
+    </a>
+
+    <button
+        class="cart-button"
+        onclick="openCart()">
+
+        Cart (<span id="cart-count">0</span>)
+
+    </button>
+
+</header>
+
+
+<main>
+
+    <a href="index.html" class="back-link">
+        ← Back to Products
+    </a>
+
+    <div class="product-page">
+
+        <!-- GALLERY -->
+
+        <div class="gallery">
+
+            <div class="image-container">
+
+                <img
+                    id="main-image"
+                    class="main-image"
+                    src=""
+                    alt="Product">
+
+                <button
+                    class="arrow arrow-left"
+                    onclick="previousImage()">
+
+                    ‹
+
+                </button>
+
+                <button
+                    class="arrow arrow-right"
+                    onclick="nextImage()">
+
+                    ›
+
+                </button>
+
+            </div>
+
+            <div
+                id="dots"
+                class="dots">
+            </div>
+
+        </div>
+
+
+        <!-- DETAILS -->
+
+        <div class="details">
+
+            <h1 id="product-name"></h1>
+
+            <div
+                id="product-price"
+                class="price">
+            </div>
+
+            <div
+                id="product-description"
+                class="description">
+            </div>
+
+
+            <div class="quantity">
+
+                <button onclick="changeQuantity(-1)">
+                    −
+                </button>
+
+                <span id="quantity">
+                    1
+                </span>
+
+                <button onclick="changeQuantity(1)">
+                    +
+                </button>
+
+            </div>
+
+
+            <div class="action-buttons">
+
+                <button onclick="addToCart()">
+                    Add to Cart
+                </button>
+
+                <button
+                    class="buy-now"
+                    onclick="buyNow()">
+
+                    Buy Now
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- CART -->
+
+<div
+    id="cart-overlay"
+    class="cart-overlay">
+
+    <div class="cart">
+
+        <div class="cart-header">
+
+            <h2>Your Cart</h2>
+
+            <button
+                class="close-cart"
+                onclick="closeCart()">
+
+                Close
+
+            </button>
+
+        </div>
+
+        <div id="cart-items"></div>
+
+        <div class="cart-total">
+
+            Total: AED
+            <span id="cart-total">
+                0.00
+            </span>
+
+        </div>
+
+        <button
+            class="checkout"
+            onclick="goToCheckout()">
+
+            Proceed to Checkout
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* PRODUCTS */
+
+    const products = {
+
+        1: {
+            name: "Japanese Style Mouse Pad",
+            price: 2,
+            description:
+                "A clean Japanese-inspired design with a smooth surface for comfortable everyday use.",
+            images: [
+                "images/Japan.jpeg",
+                "images/Japan2.jfif",
+                "images/Japan3.jfif"
+            ]
+        },
+
+        2: {
+            name: "Dark Ceramic Style Mouse Pad",
+            price: 2,
+            description:
+                "A dark ceramic-inspired design with a sleek look and smooth surface for everyday desk setups.",
+            images: [
+                "images/Gray.jpeg",
+                "images/Gray2.jfif",
+                "images/Gray3.jfif"
+            ]
+        }
+
+    };
+
+
+    /* GET PRODUCT ID */
+
+    const params =
+        new URLSearchParams(window.location.search);
+
+    const productId =
+        Number(params.get("id"));
+
+    const product =
+        products[productId];
+
+
+    /* PRODUCT QUANTITY */
+
+    let quantity = 1;
+
+
+    /* GALLERY */
+
+    let imageIndex = 0;
+
+
+    /* CHECK PRODUCT */
+
+    if (!product) {
+
+        document.querySelector(".product-page").innerHTML = `
+            <div>
+                <h1>Product Not Found</h1>
+                <p>Please return to the products page.</p>
+            </div>
+        `;
+
+    } else {
+
+        document.title =
+            product.name + " - Slyde";
+
+        loadProduct();
+
+    }
+
+
+    function changeQuantity(amount) {
+
+        quantity += amount;
+
+        if (quantity < 1) {
+            quantity = 1;
+        }
+
+        document.getElementById(
+            "quantity"
+        ).textContent = quantity;
+
+    }
+
+
+    /* GALLERY */
+
+    function loadProduct() {
+
+        document.getElementById(
+            "product-name"
+        ).textContent = product.name;
+
+        document.getElementById(
+            "product-price"
+        ).textContent =
+            "AED " + product.price;
+
+        document.getElementById(
+            "product-description"
+        ).textContent =
+            product.description;
+
+        updateImage();
+
+    }
+
+
+    function updateImage() {
+
+        document.getElementById(
+            "main-image"
+        ).src =
+            product.images[imageIndex];
+
+        renderDots();
+
+    }
+
+
+    function nextImage() {
+
+        imageIndex++;
+
+        if (
+            imageIndex >=
+            product.images.length
+        ) {
+            imageIndex = 0;
+        }
+
+        updateImage();
+
+    }
+
+
+    function previousImage() {
+
+        imageIndex--;
+
+        if (imageIndex < 0) {
+            imageIndex =
+                product.images.length - 1;
+        }
+
+        updateImage();
+
+    }
+
+
+    function renderDots() {
+
+        const dots =
+            document.getElementById("dots");
+
+        dots.innerHTML = "";
+
+        for (
+            let i = 0;
+            i < product.images.length;
+            i++
+        ) {
+
+            const dot =
+                document.createElement("button");
+
+            dot.className =
+                "dot" +
+                (i === imageIndex
+                    ? " active"
+                    : "");
+
+            dot.onclick = function () {
+
+                imageIndex = i;
+
+                updateImage();
+
+            };
+
+            dots.appendChild(dot);
+
+        }
+
+    }
+
+
+    /* CART */
+
+    let cart =
+        JSON.parse(
+            localStorage.getItem("cart")
+        ) || [];
+
+
+    function addToCart() {
+
+        const existingItem =
+            cart.find(
+                item => item.id === productId
+            );
+
+
+        if (existingItem) {
+
+            existingItem.quantity += quantity;
+
+        } else {
+
+            cart.push({
+
+                id: productId,
+
+                quantity: quantity
+
+            });
+
+        }
+
+
+        updateCart();
+
+        openCart();
+
+    }
+
+
+    function buyNow() {
+
+        cart = [
+
+            {
+                id: productId,
+                quantity: quantity
+            }
+
+        ];
+
+
+        localStorage.setItem(
+            "cart",
+            JSON.stringify(cart)
+        );
+
+
+        window.location.href =
+            "checkout.html";
+
+    }
+
+
+    /* UPDATE CART */
+
+    function updateCart() {
+
+        localStorage.setItem(
+            "cart",
+            JSON.stringify(cart)
+        );
+
+
+        const cartItems =
+            document.getElementById(
+                "cart-items"
+            );
+
+        const cartCount =
+            document.getElementById(
+                "cart-count"
+            );
+
+        const cartTotal =
+            document.getElementById(
+                "cart-total"
+            );
+
+
+        cartItems.innerHTML = "";
+
+
+        let total = 0;
+
+        let count = 0;
+
+
+        if (cart.length === 0) {
+
+            cartItems.innerHTML = `
+                <div class="empty">
+                    Your cart is empty.
+                </div>
+            `;
+
+            cartTotal.textContent =
+                "0.00";
+
+            cartCount.textContent =
+                "0";
+
+            return;
+
+        }
+
+
+        cart.forEach(item => {
+
+            const itemProduct =
+                products[item.id];
+
+            if (!itemProduct) {
+                return;
+            }
+
+
+            const itemTotal =
+                itemProduct.price *
+                item.quantity;
+
+
+            total += itemTotal;
+
+            count += item.quantity;
+
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "cart-item";
+
+
+            div.innerHTML = `
+
+                <div class="cart-item-top">
+
+                    <div>
+
+                        <div class="cart-item-name">
+                            ${itemProduct.name}
+                        </div>
+
+                        <div class="cart-item-price">
+                            AED ${itemProduct.price.toFixed(2)}
+                        </div>
+
+                    </div>
+
+                    <div>
+                        AED ${itemTotal.toFixed(2)}
+                    </div>
+
+                </div>
+
+                <div class="cart-controls">
+
+                    <button
+                        onclick="decreaseCartQuantity(${item.id})">
+                        −
+                    </button>
+
+                    <span>
+                        ${item.quantity}
+                    </span>
+
+                    <button
+                        onclick="increaseCartQuantity(${item.id})">
+                        +
+                    </button>
+
+                    <button
+                        class="remove"
+                        onclick="removeFromCart(${item.id})">
+                        Remove
+                    </button>
+
+                </div>
+
+            `;
+
+
+            cartItems.appendChild(div);
+
+        });
+
+
+        cartTotal.textContent =
+            total.toFixed(2);
+
+        cartCount.textContent =
+            count;
+
+    }
+
+
+    function increaseCartQuantity(id) {
+
+        const item =
+            cart.find(item => item.id === id);
+
+        if (item) {
+            item.quantity++;
+        }
+
+        updateCart();
+
+    }
+
+
+    function decreaseCartQuantity(id) {
+
+        const item =
+            cart.find(item => item.id === id);
+
+        if (!item) {
+            return;
+        }
+
+        item.quantity--;
+
+        if (item.quantity <= 0) {
+
+            cart =
+                cart.filter(
+                    item => item.id !== id
+                );
+
+        }
+
+        updateCart();
+
+    }
+
+
+    function removeFromCart(id) {
+
+        cart =
+            cart.filter(
+                item => item.id !== id
+            );
+
+        updateCart();
+
+    }
+
+
+    /* CART OPEN / CLOSE */
+
+    function openCart() {
+
+        document.getElementById(
+            "cart-overlay"
+        ).style.display = "block";
+
+        updateCart();
+
+    }
+
+
+    function closeCart() {
+
+        document.getElementById(
+            "cart-overlay"
+        ).style.display = "none";
+
+    }
+
+
+    /* CHECKOUT */
+
+    function goToCheckout() {
+
+        if (cart.length === 0) {
+
+            alert("Your cart is empty.");
+
+            return;
+
+        }
+
+        window.location.href =
+            "checkout.html";
+
+    }
+
+
+    /* INITIALIZE */
+
+    updateCart();
+
+</script>
+
+</body>
+</html>

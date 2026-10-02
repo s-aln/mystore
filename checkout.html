@@ -9,7 +9,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>Checkout - My Store</title>
+    <title>Checkout - Slyde</title>
 
 
     <style>
@@ -27,15 +27,24 @@
         }
 
 
-        header {
-            background: white;
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
+        /* HEADER */
+
+        .logo {
+            height: 60px;
+            width: auto;
+            display: block;
         }
 
 
-        header h1 {
-            margin: 0;
+        header {
+            background: black;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
 
@@ -102,15 +111,58 @@
         }
 
 
+        /* ORDER ITEMS */
+
         .order-item {
 
             display: flex;
 
             justify-content: space-between;
 
+            align-items: center;
+
+            gap: 15px;
+
             border-bottom: 1px solid #ddd;
 
             padding: 15px 0;
+
+        }
+
+
+        .order-item-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            min-width: 0;
+
+        }
+
+
+        .order-item-image {
+
+            width: 75px;
+
+            height: 75px;
+
+            object-fit: contain;
+
+            background: #f8f8f8;
+
+            border-radius: 8px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .order-item-info {
+
+            min-width: 0;
 
         }
 
@@ -126,6 +178,13 @@
             margin-top: 5px;
 
             font-size: 14px;
+
+        }
+
+
+        .order-item-total {
+
+            white-space: nowrap;
 
         }
 
@@ -226,6 +285,33 @@
 
         }
 
+
+        @media (max-width: 500px) {
+
+            .order-item-image {
+
+                width: 65px;
+
+                height: 65px;
+
+            }
+
+
+            .order-item {
+
+                align-items: flex-start;
+
+            }
+
+
+            .order-item-left {
+
+                gap: 10px;
+
+            }
+
+        }
+
     </style>
 
 </head>
@@ -234,9 +320,18 @@
 <body>
 
 
+    <!-- HEADER -->
+
     <header>
 
-        <h1>My Store</h1>
+        <a href="index.html">
+
+            <img
+                src="images/logo.png"
+                alt="Slyde logo"
+                class="logo">
+
+        </a>
 
     </header>
 
@@ -271,9 +366,13 @@
 
 
                     <label>
+
                         Full Name
+
                         <span class="required">*</span>
+
                     </label>
+
 
                     <input
                         type="text"
@@ -283,9 +382,13 @@
 
 
                     <label>
+
                         Phone Number
+
                         <span class="required">*</span>
+
                     </label>
+
 
                     <input
                         type="tel"
@@ -295,8 +398,11 @@
 
 
                     <label>
-                        Email Address
+
+                        Email Address (optional)
+
                     </label>
+
 
                     <input
                         type="email"
@@ -305,9 +411,13 @@
 
 
                     <label>
+
                         Delivery Address
+
                         <span class="required">*</span>
+
                     </label>
+
 
                     <textarea
                         id="customer-address"
@@ -316,9 +426,13 @@
 
 
                     <label>
+
                         City
+
                         <span class="required">*</span>
+
                     </label>
+
 
                     <input
                         type="text"
@@ -328,8 +442,59 @@
 
 
                     <label>
-                        Delivery Notes
+
+                        Emirate
+
+                        <span class="required">*</span>
+
                     </label>
+
+
+                    <select
+                        id="customer-emirate"
+                        required>
+
+                        <option value="">
+                            Select your emirate
+                        </option>
+
+                        <option value="Abu Dhabi">
+                            Abu Dhabi
+                        </option>
+
+                        <option value="Ajman">
+                            Ajman
+                        </option>
+
+                        <option value="Dubai">
+                            Dubai
+                        </option>
+
+                        <option value="Fujairah">
+                            Fujairah
+                        </option>
+
+                        <option value="Ras Al Khaimah">
+                            Ras Al Khaimah
+                        </option>
+
+                        <option value="Sharjah">
+                            Sharjah
+                        </option>
+
+                        <option value="Umm Al Quwain">
+                            Umm Al Quwain
+                        </option>
+
+                    </select>
+
+
+                    <label>
+
+                        Delivery Notes (optional)
+
+                    </label>
+
 
                     <textarea
                         id="customer-notes"
@@ -358,10 +523,13 @@
                     </span>
 
                     <span>
+
                         AED
+
                         <span id="subtotal">
                             0.00
                         </span>
+
                     </span>
 
                 </div>
@@ -374,10 +542,13 @@
                     </span>
 
                     <span>
+
                         AED
+
                         <span id="delivery-fee">
                             0.00
                         </span>
+
                     </span>
 
                 </div>
@@ -390,10 +561,13 @@
                     </span>
 
                     <span>
+
                         AED
+
                         <span id="total">
                             0.00
                         </span>
+
                     </span>
 
                 </div>
@@ -429,20 +603,16 @@
 
             1: {
                 id: 1,
-                name: "Product 1",
-                price: 2
+                name: "Japanese Style Mouse Pad",
+                price: 2,
+                image: "images/Japan.jpeg"
             },
 
             2: {
                 id: 2,
-                name: "Product 2",
-                price: 40
-            },
-
-            3: {
-                id: 3,
-                name: "Product 3",
-                price: 75
+                name: "Dark Ceramic Style Mouse Pad",
+                price: 2,
+                image: "images/Gray.jpeg"
             }
 
         };
@@ -563,27 +733,40 @@
 
                 orderItem.innerHTML = `
 
-                    <div>
+                    <div class="order-item-left">
 
-                        <div class="order-item-name">
-                            ${product.name}
-                        </div>
+                        <img
+                            src="${product.image}"
+                            alt="${product.name}"
+                            class="order-item-image">
 
-                        <div class="order-item-details">
 
-                            AED
-                            ${product.price.toFixed(2)}
+                        <div class="order-item-info">
 
-                            ×
+                            <div class="order-item-name">
 
-                            ${item.quantity}
+                                ${product.name}
+
+                            </div>
+
+
+                            <div class="order-item-details">
+
+                                AED
+                                ${product.price.toFixed(2)}
+
+                                ×
+
+                                ${item.quantity}
+
+                            </div>
 
                         </div>
 
                     </div>
 
 
-                    <div>
+                    <div class="order-item-total">
 
                         AED
                         ${itemTotal.toFixed(2)}
@@ -706,6 +889,11 @@
                     document.getElementById(
                         "customer-city"
                     ).value.trim(),
+
+                emirate:
+                    document.getElementById(
+                        "customer-emirate"
+                    ).value,
 
                 notes:
                     document.getElementById(

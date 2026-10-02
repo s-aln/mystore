@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My Store</title>
+    <title>Slyde</title>
 
     <style>
         * {
@@ -18,9 +18,11 @@
             color: #222;
         }
 
+        /* HEADER */
+
         header {
-            background: white;
-            padding: 20px;
+            background: black;
+            padding: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -30,12 +32,14 @@
             z-index: 10;
         }
 
-        header h1 {
-            margin: 0;
+        .logo {
+            height: 60px;
+            width: auto;
+            display: block;
         }
 
         .cart-button {
-            background: #111;
+            background: #444;
             color: white;
             border: none;
             padding: 12px 18px;
@@ -44,33 +48,125 @@
             font-size: 15px;
         }
 
+        /* MAIN */
+
         main {
             max-width: 1100px;
             margin: 40px auto;
             padding: 0 20px;
         }
 
+        main > h2 {
+            margin-bottom: 25px;
+        }
+
         .products {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
         }
+
+        /* PRODUCT CARD */
 
         .product {
             background: white;
             padding: 20px;
             border-radius: 10px;
             border: 1px solid #ddd;
+
+            opacity: 0;
+            transform: translateY(30px);
+            animation: productFadeUp 0.7s ease-out forwards;
+        }
+
+        .product:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        @keyframes productFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-image-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 260px;
+            object-fit: contain;
+            background: #f8f8f8;
+            border-radius: 8px;
+            display: block;
+            margin-bottom: 18px;
         }
 
         .product h2 {
             margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .product-description {
+            color: #555;
+            line-height: 1.5;
+            min-height: 140px;
+        }
+
+        .product-description ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .product-description li {
+            margin-bottom: 6px;
         }
 
         .price {
             font-size: 20px;
             font-weight: bold;
             margin: 15px 0;
+        }
+
+        /* PRODUCT ACTIONS */
+
+        .product-actions {
+            margin-top: 15px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .quantity-selector button {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            font-size: 20px;
+        }
+
+        .quantity-selector span {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         button {
@@ -86,6 +182,10 @@
             opacity: 0.8;
         }
 
+        .buy-now-button {
+            background: #444;
+        }
+
         /* CART */
 
         .cart-overlay {
@@ -96,6 +196,11 @@
             z-index: 20;
         }
 
+        .cart-overlay.open {
+            display: block;
+            animation: overlayFadeIn 0.25s ease-out forwards;
+        }
+
         .cart {
             background: white;
             width: 100%;
@@ -104,6 +209,33 @@
             margin-left: auto;
             padding: 25px;
             overflow-y: auto;
+
+            transform: translateX(100%);
+            animation: cartSlideIn 0.35s ease-out forwards;
+        }
+
+        .cart-overlay.open .cart {
+            animation: cartSlideIn 0.35s ease-out forwards;
+        }
+
+        @keyframes overlayFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes cartSlideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
         }
 
         .cart-header {
@@ -123,14 +255,37 @@
             color: #222;
         }
 
+        /* CART ITEMS */
+
         .cart-item {
             border-bottom: 1px solid #ddd;
             padding: 20px 0;
         }
 
+        .cart-item-content {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .cart-item-image {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+            background: #f8f8f8;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            min-width: 0;
+        }
+
         .cart-item-top {
             display: flex;
             justify-content: space-between;
+            gap: 10px;
         }
 
         .cart-item-name {
@@ -147,6 +302,7 @@
             align-items: center;
             gap: 10px;
             margin-top: 12px;
+            flex-wrap: wrap;
         }
 
         .quantity-controls button {
@@ -176,6 +332,48 @@
             margin-top: 50px;
             color: #666;
         }
+
+        /* MOBILE */
+
+        @media (max-width: 600px) {
+
+            .product-image {
+                height: 220px;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-item-image {
+                width: 75px;
+                height: 75px;
+            }
+
+        }
+
+        /* REDUCE ANIMATION FOR USERS WHO PREFER LESS MOTION */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .product {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+
+            .cart-overlay.open {
+                animation: none;
+                opacity: 1;
+            }
+
+            .cart,
+            .cart-overlay.open .cart {
+                animation: none;
+                transform: translateX(0);
+            }
+
+        }
     </style>
 </head>
 
@@ -185,7 +383,12 @@
 
     <header>
 
-        <h1>My Store</h1>
+        <a href="index.html">
+            <img
+                src="images/logo.png"
+                alt="Slyde logo"
+                class="logo">
+        </a>
 
         <button class="cart-button" onclick="openCart()">
             Cart (<span id="cart-count">0</span>)
@@ -198,63 +401,157 @@
 
     <main>
 
-        <h2>Our Products</h2>
+        <h2>Our Mouse Pads</h2>
 
         <div class="products">
 
+
+            <!-- PRODUCT 1 -->
+
             <div class="product">
 
-                <h2>Product 1</h2>
+                <a
+                    href="product.html?id=1"
+                    class="product-image-link">
 
-                <p>
-                    Example product description.
-                </p>
+                    <img
+                        src="images/Japan.jpeg"
+                        alt="Japanese Style Mouse Pad"
+                        class="product-image">
+
+                    <h2>Japanese Style Mouse Pad</h2>
+
+                </a>
+
+                <div class="product-description">
+
+                    <ul>
+                        <li>Size: 80 × 40 cm (800 × 400 mm)</li>
+                        <li>Thickness: 4 mm</li>
+                        <li>Waterproof</li>
+                        <li>Non-slip</li>
+                        <li>Smooth surface</li>
+                    </ul>
+
+                </div>
 
                 <div class="price">
                     AED 2
                 </div>
 
-                <button onclick="addToCart(1)">
-                    Add to Cart
-                </button>
+                <div class="product-actions">
+
+                    <div class="quantity-selector">
+
+                        <button
+                            type="button"
+                            onclick="changeProductQuantity(1, -1)">
+                            −
+                        </button>
+
+                        <span id="quantity-1">1</span>
+
+                        <button
+                            type="button"
+                            onclick="changeProductQuantity(1, 1)">
+                            +
+                        </button>
+
+                    </div>
+
+                    <div class="action-buttons">
+
+                        <button
+                            type="button"
+                            onclick="addSelectedProduct(1)">
+                            Add to Cart
+                        </button>
+
+                        <button
+                            type="button"
+                            class="buy-now-button"
+                            onclick="buyNow(1)">
+                            Buy Now
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-            <div class="product">
-
-                <h2>Product 2</h2>
-
-                <p>
-                    Example product description.
-                </p>
-
-                <div class="price">
-                    AED 40
-                </div>
-
-                <button onclick="addToCart(2)">
-                    Add to Cart
-                </button>
-
-            </div>
-
+            <!-- PRODUCT 2 -->
 
             <div class="product">
 
-                <h2>Product 3</h2>
+                <a
+                    href="product.html?id=2"
+                    class="product-image-link">
 
-                <p>
-                    Example product description.
-                </p>
+                    <img
+                        src="images/Gray.jpeg"
+                        alt="Dark Ceramic Style Mouse Pad"
+                        class="product-image">
 
-                <div class="price">
-                    AED 75
+                    <h2>Dark Ceramic Style Mouse Pad</h2>
+
+                </a>
+
+                <div class="product-description">
+
+                    <ul>
+                        <li>Size: 80 × 40 cm (800 × 400 mm)</li>
+                        <li>Thickness: 4 mm</li>
+                        <li>Waterproof</li>
+                        <li>Non-slip</li>
+                        <li>Smooth surface</li>
+                    </ul>
+
                 </div>
 
-                <button onclick="addToCart(3)">
-                    Add to Cart
-                </button>
+                <div class="price">
+                    AED 2
+                </div>
+
+                <div class="product-actions">
+
+                    <div class="quantity-selector">
+
+                        <button
+                            type="button"
+                            onclick="changeProductQuantity(2, -1)">
+                            −
+                        </button>
+
+                        <span id="quantity-2">1</span>
+
+                        <button
+                            type="button"
+                            onclick="changeProductQuantity(2, 1)">
+                            +
+                        </button>
+
+                    </div>
+
+                    <div class="action-buttons">
+
+                        <button
+                            type="button"
+                            onclick="addSelectedProduct(2)">
+                            Add to Cart
+                        </button>
+
+                        <button
+                            type="button"
+                            class="buy-now-button"
+                            onclick="buyNow(2)">
+                            Buy Now
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -281,14 +578,13 @@
 
             </div>
 
-
             <div id="cart-items"></div>
-
 
             <div id="cart-bottom">
 
                 <div class="cart-total">
-                    Total: AED <span id="cart-total">0.00</span>
+                    Total: AED
+                    <span id="cart-total">0.00</span>
                 </div>
 
                 <button
@@ -316,20 +612,16 @@
 
             1: {
                 id: 1,
-                name: "Product 1",
-                price: 2
+                name: "Japanese Style Mouse Pad",
+                price: 2,
+                image: "images/Japan.jpeg"
             },
 
             2: {
                 id: 2,
-                name: "Product 2",
-                price: 40
-            },
-
-            3: {
-                id: 3,
-                name: "Product 3",
-                price: 75
+                name: "Dark Ceramic Style Mouse Pad",
+                price: 2,
+                image: "images/Gray.jpeg"
             }
 
         };
@@ -341,7 +633,51 @@
         -----------------------------------------
         */
 
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        let cart =
+            JSON.parse(localStorage.getItem("cart")) || [];
+
+
+        /*
+        -----------------------------------------
+        PRODUCT CARD QUANTITIES
+        -----------------------------------------
+        */
+
+        const selectedQuantities = {
+            1: 1,
+            2: 1
+        };
+
+
+        function changeProductQuantity(productId, amount) {
+
+            selectedQuantities[productId] += amount;
+
+            if (selectedQuantities[productId] < 1) {
+                selectedQuantities[productId] = 1;
+            }
+
+            document.getElementById(
+                `quantity-${productId}`
+            ).textContent =
+                selectedQuantities[productId];
+        }
+
+
+        /*
+        -----------------------------------------
+        ADD SELECTED PRODUCT TO CART
+        -----------------------------------------
+        */
+
+        function addSelectedProduct(productId) {
+
+            const quantity =
+                selectedQuantities[productId];
+
+            addToCart(productId, quantity);
+
+        }
 
 
         /*
@@ -350,7 +686,7 @@
         -----------------------------------------
         */
 
-        function addToCart(productId) {
+        function addToCart(productId, quantity = 1) {
 
             const existingItem = cart.find(
                 item => item.id === productId
@@ -359,7 +695,7 @@
 
             if (existingItem) {
 
-                existingItem.quantity++;
+                existingItem.quantity += quantity;
 
             } else {
 
@@ -367,7 +703,7 @@
 
                     id: productId,
 
-                    quantity: 1
+                    quantity: quantity
 
                 });
 
@@ -383,13 +719,44 @@
 
         /*
         -----------------------------------------
+        BUY NOW
+        -----------------------------------------
+        */
+
+        function buyNow(productId) {
+
+            const quantity =
+                selectedQuantities[productId];
+
+            cart = [
+                {
+                    id: productId,
+                    quantity: quantity
+                }
+            ];
+
+            localStorage.setItem(
+                "cart",
+                JSON.stringify(cart)
+            );
+
+            window.location.href = "checkout.html";
+
+        }
+
+
+        /*
+        -----------------------------------------
         UPDATE CART
         -----------------------------------------
         */
 
         function updateCart() {
 
-            localStorage.setItem("cart", JSON.stringify(cart));
+            localStorage.setItem(
+                "cart",
+                JSON.stringify(cart)
+            );
 
             const cartItems =
                 document.getElementById("cart-items");
@@ -409,10 +776,6 @@
             let itemCount = 0;
 
 
-            /*
-            Empty cart
-            */
-
             if (cart.length === 0) {
 
                 cartItems.innerHTML = `
@@ -430,14 +793,15 @@
             }
 
 
-            /*
-            Display products
-            */
-
             cart.forEach(item => {
 
                 const product =
                     products[item.id];
+
+
+                if (!product) {
+                    return;
+                }
 
 
                 const itemTotal =
@@ -458,48 +822,61 @@
 
                 cartItem.innerHTML = `
 
-                    <div class="cart-item-top">
+                    <div class="cart-item-content">
 
-                        <div>
+                        <img
+                            src="${product.image}"
+                            alt="${product.name}"
+                            class="cart-item-image">
 
-                            <div class="cart-item-name">
-                                ${product.name}
+                        <div class="cart-item-details">
+
+                            <div class="cart-item-top">
+
+                                <div>
+
+                                    <div class="cart-item-name">
+                                        ${product.name}
+                                    </div>
+
+                                    <div class="cart-item-price">
+                                        AED ${product.price.toFixed(2)}
+                                    </div>
+
+                                </div>
+
+                                <div>
+                                    AED ${itemTotal.toFixed(2)}
+                                </div>
+
                             </div>
 
-                            <div class="cart-item-price">
-                                AED ${product.price.toFixed(2)}
+
+                            <div class="quantity-controls">
+
+                                <button
+                                    onclick="decreaseQuantity(${product.id})">
+                                    −
+                                </button>
+
+                                <span>
+                                    ${item.quantity}
+                                </span>
+
+                                <button
+                                    onclick="increaseQuantity(${product.id})">
+                                    +
+                                </button>
+
+                                <button
+                                    class="remove-button"
+                                    onclick="removeFromCart(${product.id})">
+                                    Remove
+                                </button>
+
                             </div>
 
                         </div>
-
-                        <div>
-                            AED ${itemTotal.toFixed(2)}
-                        </div>
-
-                    </div>
-
-
-                    <div class="quantity-controls">
-
-                        <button
-                            onclick="decreaseQuantity(${product.id})">
-                            −
-                        </button>
-
-                        <span>
-                            ${item.quantity}
-                        </span>
-
-                        <button
-                            onclick="increaseQuantity(${product.id})">
-                            +
-                        </button>
-
-                        <button
-                            class="remove-button"
-                            onclick="removeFromCart(${product.id})">
-                            Remove
-                        </button>
 
                     </div>
 
@@ -510,10 +887,6 @@
 
             });
 
-
-            /*
-            Update totals
-            */
 
             cartTotal.textContent =
                 total.toFixed(2);
@@ -538,9 +911,7 @@
 
 
             if (item) {
-
                 item.quantity++;
-
             }
 
 
@@ -611,10 +982,16 @@
 
         function openCart() {
 
-            document.getElementById(
-                "cart-overlay"
-            ).style.display = "block";
+            const overlay =
+                document.getElementById("cart-overlay");
 
+            overlay.classList.remove("open");
+
+            /* Force the browser to restart the animation */
+
+            void overlay.offsetWidth;
+
+            overlay.classList.add("open");
 
             updateCart();
 
@@ -629,9 +1006,10 @@
 
         function closeCart() {
 
-            document.getElementById(
-                "cart-overlay"
-            ).style.display = "none";
+            const overlay =
+                document.getElementById("cart-overlay");
+
+            overlay.classList.remove("open");
 
         }
 

@@ -1,53 +1,94 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Failed</title>
+    <title>Payment Failed - Slyde</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-            padding: 40px 20px;
-            text-align: center;
-        }
 
-        .box {
-            max-width: 500px;
-            margin: 50px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-        }
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-        h1 {
-            color: #b42318;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        color: #222;
+    }
 
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 20px;
-            background: #111;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-    </style>
+    /* HEADER */
+
+    .logo {
+        height: 60px;
+        width: auto;
+        display: block;
+    }
+
+    header {
+        background: black;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .box {
+        max-width: 500px;
+        margin: 50px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    h1 {
+        color: #b42318;
+    }
+
+  .box a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 20px;
+    background: #111;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.box a:hover {
+    opacity: 0.85;
+}
+</style>
+
+
 </head>
 
 <body>
 
+<header>
+  <a href="index.html">
+    <img src="images/logo.png" alt="Slyde logo" class="logo">
+</a>
+</header>
+
 <div class="box">
     <h1>Payment Failed</h1>
 
-    <p>Unfortunately, the payment was not completed.</p>
 
-    <p>No order has been created.</p>
+<p>Unfortunately, the payment was not completed.</p>
 
-    <a href="checkout.html">Try Again</a>
+<p>No order has been created.</p>
+
+<a href="checkout.html">Try Again</a>
+
+
 </div>
 
 </body>

@@ -1,4 +1,3 @@
-
 const { randomUUID } = require("crypto");
 
 exports.handler = async function (event) {
@@ -33,7 +32,8 @@ exports.handler = async function (event) {
             !customer.name ||
             !customer.phone ||
             !customer.address ||
-            !customer.city
+            !customer.city ||
+            !customer.emirate
         ) {
             return {
                 statusCode: 400,
@@ -44,20 +44,15 @@ exports.handler = async function (event) {
             };
         }
 
-        // These are our current test-store products.
-        // Later we will move products into the database.
+        // Store products
         const products = {
             1: {
-                name: "Product 1",
+                name: "Japanese Style Mouse Pad",
                 price: 2
             },
             2: {
-                name: "Product 2",
-                price: 40
-            },
-            3: {
-                name: "Product 3",
-                price: 75
+                name: "Dark Ceramic Style Mouse Pad",
+                price: 2
             }
         };
 
@@ -95,7 +90,7 @@ exports.handler = async function (event) {
             });
         }
 
-        // Current test delivery fee
+        // Delivery fee
         const deliveryFee = 0;
 
         const total = subtotal + deliveryFee;
@@ -143,6 +138,7 @@ exports.handler = async function (event) {
                     email: customer.email || null,
                     address: customer.address,
                     city: customer.city,
+                    emirate: customer.emirate,
                     notes: customer.notes || null,
                     items: verifiedItems,
                     subtotal: subtotal,
@@ -187,7 +183,7 @@ exports.handler = async function (event) {
                 body: JSON.stringify({
                     amount: amountInFils,
                     currency_code: "AED",
-                    message: "My Store order",
+                    message: "Slyde Order",
 
                     success_url:
                         `${siteUrl}/payment-success.html?session_id=${sessionId}`,

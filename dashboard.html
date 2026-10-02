@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Slyde Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        /* HEADER */
+
+        header {
+            background: black;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+            display: block;
+        }
+
+        /* DASHBOARD */
+
+        main {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .message {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        /* LOGIN */
+
+        .login-box {
+            max-width: 400px;
+            margin: 80px auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 30px;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .login-box label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: #111;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-box button:hover {
+            opacity: 0.85;
+        }
+
+        .login-error {
+            color: #b00020;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        /* ORDERS */
+
+        .orders {
+            display: grid;
+            gap: 20px;
+        }
+
+        .order {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .order-id {
+            font-weight: bold;
+        }
+
+        .order-date {
+            color: #666;
+            text-align: right;
+        }
+
+        .customer {
+            margin-bottom: 20px;
+        }
+
+        .customer p {
+            margin: 6px 0;
+        }
+
+        .customer-label {
+            color: #666;
+        }
+
+        .items {
+            border-top: 1px solid #eee;
+            margin-top: 15px;
+        }
+
+        .item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-name {
+            font-weight: bold;
+        }
+
+        .item-details {
+            color: #666;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #222;
+        }
+
+        .status {
+            color: #18794e;
+            font-weight: bold;
+        }
+
+        .loading {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .error {
+            color: #b00020;
+        }
+
+        @media (max-width: 600px) {
+
+            .order-header {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .order-date {
+                text-align: left;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <a href="index.html">
+        <img
+            src="images/logo.png"
+            alt="Slyde logo"
+            class="logo">
+    </a>
+
+</header>
+
+<main>
+
+<div id="content">
+
+    <div class="message loading">
+        Checking dashboard access...
+    </div>
+
+</div>
+
+</main>
+
+<script>
+
+async function loadOrders() {
+
+    const content =
+        document.getElementById("content");
+
+    try {
+
+        const response = await fetch(
+            "/.netlify/functions/get-orders"
+        );
+
+        if (response.status === 401) {
+            showLogin();
+            return;
+        }
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+
+            throw new Error(
+                result.error ||
+                "Could not load orders."
+            );
+        }
+
+        showOrders(result.orders || []);
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+        content.innerHTML = `
+            <div class="message error">
+                <h2>Could not load orders</h2>
+
+                <p>
+                    ${escapeHtml(error.message)}
+                </p>
+            </div>
+        `;
+    }
+}
+
+
+function showLogin() {
+
+    const content =
+        document.getElementById("content");
+
+    content.innerHTML = `
+
+        <div class="login-box">
+
+            <h1>Slyde Dashboard</h1>
+
+            <form id="loginForm">
+
+                <label for="password">
+                    Dashboard Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button type="submit">
+                    Login
+                </button>
+
+                <div
+                    id="loginError"
+                    class="login-error">
+                </div>
+
+            </form>
+
+        </div>
+
+    `;
+
+    document
+        .getElementById("loginForm")
+        .addEventListener(
+            "submit",
+            login
+        );
+}
+
+
+async function login(event) {
+
+    event.preventDefault();
+
+    const password =
+        document.getElementById("password").value;
+
+    const loginError =
+        document.getElementById("loginError");
+
+    loginError.textContent = "";
+
+    try {
+
+        const response = await fetch(
+            "/.netlify/functions/login-dashboard",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    password: password
+                })
+            }
+        );
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+
+            loginError.textContent =
+                result.error ||
+                "Incorrect password.";
+
+            return;
+        }
+
+        loadOrders();
+
+    } catch (error) {
+
+        console.error(
+            "Login error:",
+            error
+        );
+
+        loginError.textContent =
+            "Could not connect to the server.";
+    }
+}
+
+
+function showOrders(orders) {
+
+    const content =
+        document.getElementById("content");
+
+    if (orders.length === 0) {
+
+        content.innerHTML = `
+            <h1>Orders</h1>
+
+            <div class="message">
+                <h2>No paid orders yet</h2>
+
+                <p>
+                    Successful orders will appear here.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    content.innerHTML = `
+        <h1>Orders</h1>
+    `;
+
+    const ordersContainer =
+        document.createElement("div");
+
+    ordersContainer.className =
+        "orders";
+
+    orders.forEach(order => {
+
+        const orderElement =
+            document.createElement("div");
+
+        orderElement.className =
+            "order";
+
+        let itemsHtml = "";
+
+        if (Array.isArray(order.items)) {
+
+            order.items.forEach(item => {
+
+                itemsHtml += `
+                    <div class="item">
+
+                        <div class="item-name">
+                            ${escapeHtml(item.name)}
+                        </div>
+
+                        <div class="item-details">
+                            AED ${Number(item.price).toFixed(2)}
+                            × ${Number(item.quantity)}
+                            =
+                            AED ${Number(item.total).toFixed(2)}
+                        </div>
+
+                    </div>
+                `;
+
+            });
+
+        }
+
+        const date =
+            order.created_at
+                ? new Date(order.created_at)
+                    .toLocaleString()
+                : "Unknown";
+
+        orderElement.innerHTML = `
+
+            <div class="order-header">
+
+                <div>
+
+                    <div class="order-id">
+                        Order #${escapeHtml(order.id)}
+                    </div>
+
+                    <div class="status">
+                        PAID
+                    </div>
+
+                </div>
+
+                <div class="order-date">
+                    ${escapeHtml(date)}
+                </div>
+
+            </div>
+
+            <div class="customer">
+
+                <p>
+                    <span class="customer-label">
+                        Customer:
+                    </span>
+                    ${escapeHtml(order.customer_name)}
+                </p>
+
+                <p>
+                    <span class="customer-label">
+                        Phone:
+                    </span>
+                    ${escapeHtml(order.phone)}
+                </p>
+
+                <p>
+                    <span class="customer-label">
+                        Email:
+                    </span>
+                    ${escapeHtml(order.email || "Not provided")}
+                </p>
+
+                <p>
+                    <span class="customer-label">
+                        Address:
+                    </span>
+                    ${escapeHtml(order.address)}
+                </p>
+
+                <p>
+                    <span class="customer-label">
+                        City:
+                    </span>
+                    ${escapeHtml(order.city)}
+                </p>
+
+                <p>
+                    <span class="customer-label">
+                        Emirate:
+                    </span>
+                    ${escapeHtml(order.emirate || "Not provided")}
+                </p>
+
+                ${
+                    order.notes
+                        ? `
+                            <p>
+                                <span class="customer-label">
+                                    Notes:
+                                </span>
+                                ${escapeHtml(order.notes)}
+                            </p>
+                        `
+                        : ""
+                }
+
+            </div>
+
+            <h3>Items</h3>
+
+            <div class="items">
+                ${itemsHtml}
+            </div>
+
+            <div class="total">
+
+                <span>
+                    Total Paid
+                </span>
+
+                <span>
+                    AED ${Number(order.total).toFixed(2)}
+                </span>
+
+            </div>
+
+        `;
+
+        ordersContainer.appendChild(
+            orderElement
+        );
+
+    });
+
+    content.appendChild(
+        ordersContainer
+    );
+}
+
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        value ?? "";
+
+    return div.innerHTML;
+}
+
+
+loadOrders();
+
+</script>
+
+</body>
+</html>
