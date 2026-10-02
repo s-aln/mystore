@@ -154,6 +154,15 @@
             margin-bottom: 25px;
         }
 
+        .description ul {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+
+        .description li {
+            margin-bottom: 4px;
+        }
+
         .quantity {
             display: flex;
             align-items: center;
@@ -496,8 +505,15 @@
         1: {
             name: "Japanese Style Mouse Pad",
             price: 2,
-            description:
-                "A clean Japanese-inspired design with a smooth surface for comfortable everyday use.",
+            description: `
+                Size: 80 × 40 cm (800 × 400 mm)
+                <ul>
+                    <li>Thickness: 4 mm</li>
+                    <li>Waterproof</li>
+                    <li>Non-slip</li>
+                    <li>Smooth surface</li>
+                </ul>
+            `,
             images: [
                 "images/Japan.jpeg",
                 "images/Japan2.jfif",
@@ -508,8 +524,15 @@
         2: {
             name: "Dark Ceramic Style Mouse Pad",
             price: 2,
-            description:
-                "A dark ceramic-inspired design with a sleek look and smooth surface for everyday desk setups.",
+            description: `
+                Size: 80 × 40 cm (800 × 400 mm)
+                <ul>
+                    <li>Thickness: 4 mm</li>
+                    <li>Waterproof</li>
+                    <li>Non-slip</li>
+                    <li>Smooth surface</li>
+                </ul>
+            `,
             images: [
                 "images/Gray.jpeg",
                 "images/Gray2.jfif",
@@ -593,7 +616,7 @@
 
         document.getElementById(
             "product-description"
-        ).textContent =
+        ).innerHTML =
             product.description;
 
         updateImage();

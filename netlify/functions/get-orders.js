@@ -89,13 +89,13 @@ exports.handler = async function (event) {
             .update(data)
             .digest("hex");
 
-if (
-    signature.length !== expectedSignature.length ||
-    !crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(expectedSignature)
-    )
-) {
+        if (
+            signature.length !== expectedSignature.length ||
+            !crypto.timingSafeEqual(
+                Buffer.from(signature),
+                Buffer.from(expectedSignature)
+            )
+        ) {
             return {
                 statusCode: 401,
                 body: JSON.stringify({
@@ -119,23 +119,28 @@ if (
             };
         }
 
-        const response = await fetch(
+        const supabaseHeaders = {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json"
+        };
+
+        // Load paid orders
+        const ordersResponse = await fetch(
             `${supabaseUrl}/rest/v1/orders?payment_status=eq.paid&order=created_at.desc`,
             {
                 method: "GET",
-
-                headers: {
-                    "apikey": supabaseKey,
-                    "Authorization": `Bearer ${supabaseKey}`,
-                    "Content-Type": "application/json"
-                }
+                headers: supabaseHeaders
             }
         );
 
-        const data = await response.json();
+        const orders = await ordersResponse.json();
 
-        if (!response.ok) {
-            console.error("Supabase error:", data);
+        if (!ordersResponse.ok) {
+            console.error(
+                "Supabase orders error:",
+                orders
+            );
 
             return {
                 statusCode: 500,
@@ -145,25 +150,56 @@ if (
             };
         }
 
+        // Load products and current stock
+        const productsResponse = await fetch(
+            `${supabaseUrl}/rest/v1/products?active=eq.true&order=id.asc`,
+            {
+                method: "GET",
+                headers: supabaseHeaders
+            }
+        );
+
+        const products = await productsResponse.json();
+
+        if (!productsResponse.ok) {
+            console.error(
+                "Supabase products error:",
+                products
+            );
+
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: "Could not load products."
+                })
+            };
+        }
+
         return {
             statusCode: 200,
+
             headers: {
                 "Content-Type": "application/json"
             },
+
             body: JSON.stringify({
                 success: true,
-                orders: data
+                orders: orders,
+                products: products
             })
         };
 
     } catch (error) {
 
-        console.error("Get orders error:", error);
+        console.error(
+            "Get orders error:",
+            error
+        );
 
         return {
             statusCode: 500,
             body: JSON.stringify({
-                error: "Server error while loading orders."
+                error: "Server error while loading dashboard."
             })
         };
     }

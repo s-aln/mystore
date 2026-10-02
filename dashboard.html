@@ -110,6 +110,41 @@
             text-align: center;
         }
 
+        /* INVENTORY */
+
+        .inventory {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .inventory-product {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .inventory-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .inventory-price {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .inventory-stock {
+            font-size: 18px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
         /* ORDERS */
 
         .orders {
@@ -200,6 +235,15 @@
 
         @media (max-width: 600px) {
 
+            .inventory-product {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .inventory-stock {
+                white-space: normal;
+            }
+
             .order-header {
                 flex-direction: column;
                 gap: 8px;
@@ -263,11 +307,14 @@ async function loadOrders() {
 
             throw new Error(
                 result.error ||
-                "Could not load orders."
+                "Could not load dashboard."
             );
         }
 
-        showOrders(result.orders || []);
+        showDashboard(
+            result.orders || [],
+            result.products || []
+        );
 
     } catch (error) {
 
@@ -278,7 +325,7 @@ async function loadOrders() {
 
         content.innerHTML = `
             <div class="message error">
-                <h2>Could not load orders</h2>
+                <h2>Could not load dashboard</h2>
 
                 <p>
                     ${escapeHtml(error.message)}
@@ -393,16 +440,88 @@ async function login(event) {
 }
 
 
-function showOrders(orders) {
+function showDashboard(orders, products) {
 
     const content =
         document.getElementById("content");
 
+    content.innerHTML = `
+        <h1>Inventory</h1>
+
+        <div id="inventory" class="inventory">
+        </div>
+
+        <h1>Orders</h1>
+
+        <div id="orders" class="orders">
+        </div>
+    `;
+
+    showInventory(products);
+    showOrders(orders);
+}
+
+
+function showInventory(products) {
+
+    const inventory =
+        document.getElementById("inventory");
+
+    if (products.length === 0) {
+
+        inventory.innerHTML = `
+            <div class="message">
+                No active products found.
+            </div>
+        `;
+
+        return;
+    }
+
+    products.forEach(product => {
+
+        const productElement =
+            document.createElement("div");
+
+        productElement.className =
+            "inventory-product";
+
+        productElement.innerHTML = `
+
+            <div>
+
+                <div class="inventory-name">
+                    ${escapeHtml(product.name)}
+                </div>
+
+                <div class="inventory-price">
+                    AED ${Number(product.price).toFixed(2)}
+                </div>
+
+            </div>
+
+            <div class="inventory-stock">
+                Stock: ${Number(product.stock)}
+            </div>
+
+        `;
+
+        inventory.appendChild(
+            productElement
+        );
+
+    });
+}
+
+
+function showOrders(orders) {
+
+    const ordersContainer =
+        document.getElementById("orders");
+
     if (orders.length === 0) {
 
-        content.innerHTML = `
-            <h1>Orders</h1>
-
+        ordersContainer.innerHTML = `
             <div class="message">
                 <h2>No paid orders yet</h2>
 
@@ -414,16 +533,6 @@ function showOrders(orders) {
 
         return;
     }
-
-    content.innerHTML = `
-        <h1>Orders</h1>
-    `;
-
-    const ordersContainer =
-        document.createElement("div");
-
-    ordersContainer.className =
-        "orders";
 
     orders.forEach(order => {
 
@@ -572,10 +681,6 @@ function showOrders(orders) {
         );
 
     });
-
-    content.appendChild(
-        ordersContainer
-    );
 }
 
 
